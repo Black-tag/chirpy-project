@@ -1,15 +1,23 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 	"strings"
 	"sync/atomic"
+
+	"github.com/blacktag/chirpy-project/internal/database"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
 type apiConfig struct {
 	fileserverHits atomic.Int32
+	DB *database.Queries
 }
 
 type chirpResponse struct {
@@ -178,7 +186,17 @@ func filterProfanity(text string) string {
 
 func main() {
 
+	godotenv.Load()
+
 	cfg := apiConfig{}
+	dbUrl := os.Getenv("DB_URL")
+
+	db, err := sql.Open("postgres", dbUrl)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+	// dbQueries := database.New(db)
 
 	// created a new  mux
 	mux := http.NewServeMux()
@@ -208,7 +226,7 @@ func main() {
 
 
 	fmt.Println("🌐 starting the server on: http://localhost:8080...")
-	err:= server.ListenAndServe()
+	err = server.ListenAndServe()
 	if err != nil {
 		fmt.Printf("🛑 Server Failed: %v\n", err)
 	}

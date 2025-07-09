@@ -29,24 +29,14 @@ func (cfg *apiConfig)createUserHandler(w http.ResponseWriter, r *http.Request){
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	//  if cfg == nil {
-    //     http.Error(w, "Server configuration error", http.StatusInternalServerError)
-    //     return
-    // }
-
-    // // 2. Check if DB is initialized
-    // if cfg.DB == nil {
-    //     http.Error(w, "Database not initialized", http.StatusInternalServerError)
-    //     return
-    // }
-
-	// log.Println("incoming requests to api/users")
+	
 	
 	w.Header().Set("Content-Type", "application/json")
 	
 	var req createUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err!=nil {
 		respondWithError(w, http.StatusBadRequest,"Invalid Request")
+		return
 	}
 	// validate the input 
 	if req.Email == ""  {

@@ -84,8 +84,9 @@ func main() {
 	mux := http.NewServeMux()
 
 	//register readiness endpoint
-	
-	mux.HandleFunc("POST /api/validate_chirp",cfg.validateChirpHandler)
+	mux.HandleFunc("GET /api/chirps/{chirpID}", cfg.getChirpByIDHandler)
+	mux.HandleFunc("GET /api/chirps",cfg.getChirpHandler)
+	mux.HandleFunc("POST /api/chirps",cfg.createChirpHandler)
 	mux.HandleFunc("POST /api/users",cfg.createUserHandler)
 	mux.HandleFunc("GET /admin/metrics", cfg.metricsHandler)
 	mux.HandleFunc("POST /admin/reset", cfg.resetMetrics)

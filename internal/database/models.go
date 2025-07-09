@@ -6,13 +6,13 @@ package database
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type User struct {
-	ID           int32
-	Username     string
-	Email        string
-	PasswordHash string
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
+	ID        uuid.UUID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Email     string
 }

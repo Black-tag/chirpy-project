@@ -7,11 +7,12 @@ import (
 	"log"
 	"time"
 	"github.com/google/uuid"
-	// "context"
+	
 )
 type createUserRequest struct {
-	Email string `json:"email"`
-	// Password string `json:"password"`
+	
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 type createUserResponse struct {
@@ -44,9 +45,7 @@ func (cfg *apiConfig)createUserHandler(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	// ctx := context.Background()
-	// ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	// defer cancel()
+	
 
 	user, err := cfg.db.CreateUser(r.Context(), req.Email)
 	if err != nil {

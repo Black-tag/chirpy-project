@@ -75,15 +75,13 @@ func main() {
 	}
 	
 
-	
-	// defer dbConn.Close()
-	// dbQueries := database.New(db)
-	// Get platform (default to "dev" if not set)
+
     
 	// created a new  mux
 	mux := http.NewServeMux()
 
 	//register readiness endpoint
+	mux.HandleFunc("POST /api/login", cfg.loginUserHandler)
 	mux.HandleFunc("GET /api/chirps/{chirpID}", cfg.getChirpByIDHandler)
 	mux.HandleFunc("GET /api/chirps",cfg.getChirpHandler)
 	mux.HandleFunc("POST /api/chirps",cfg.createChirpHandler)

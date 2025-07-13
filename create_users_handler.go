@@ -1,13 +1,14 @@
-
 package main
 
 import (
 	"encoding/json"
-	"net/http"
 	"log"
+	"net/http"
 	"time"
+
+	"github.com/blacktag/chirpy-project/internal/auth"
+	"github.com/blacktag/chirpy-project/internal/database"
 	"github.com/google/uuid"
-	
 )
 type createUserRequest struct {
 	
@@ -44,10 +45,24 @@ func (cfg *apiConfig)createUserHandler(w http.ResponseWriter, r *http.Request){
 		respondWithError(w, http.StatusBadRequest, "Inavalid request")
 		return
 	}
+	hashedPassword, err := auth.HashPassword(req.Password)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "coudnt decode parametrs")
+		return
+	}
+
+	// _, err := cfg.db.GetUserByEmail(r.Context(), req.Email)
+	// if err == nil {
+	// 	respondWithError(w, http.StatusConflict, " User alredy exist")
+	// 	return
+	// }
 
 	
 
-	user, err := cfg.db.CreateUser(r.Context(), req.Email)
+	user, err := cfg.db.CreateUser(r.Context(), database.CreateUserParams{
+		Email:  req.Email,
+		HashedPassword: hashedPassword,
+	})
 	if err != nil {
 		log.Printf("❌ DB error: %v", err)
 		respondWithError(w, http.StatusInternalServerError, "Couldnt create user")
@@ -55,8 +70,8 @@ func (cfg *apiConfig)createUserHandler(w http.ResponseWriter, r *http.Request){
 	}
 	respondWithJSON(w, http.StatusCreated, createUserResponse{
 		ID:        user.ID,
-		Email:     user.Email,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
+		Email:     user.Email,
 	})
 }

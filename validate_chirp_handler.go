@@ -11,21 +11,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// type chirpResponse struct {
-//     CleanedBody string `json:"cleaned_body"`
-// }
 
-// type chirprequest struct {
-// 	Body string `json:"body"`
-// }
-
-// type errorResponse struct {
-// 	Error string `json:"error"`
-// }
-
-// type validResponse struct {
-// 	Valid bool `json:"valid"`
-// }
 
 type chirpInput struct {
 	Body string `json:"body"`
@@ -52,15 +38,7 @@ func (cfg *apiConfig)createChirpHandler(w http.ResponseWriter, r *http.Request){
 
 	}
 
-	// var req chirprequest
-	// decoder := json.NewDecoder(r.Body)
-	// err := decoder.Decode(&req)
-	// if err != nil {
-	// 	respondWithError(w, http.StatusBadRequest, "Invalid Request Body")
-	// 	return
-	// }
-
-	// // validate chirp 
+	
 
 	
 	var req chirpInput
@@ -78,10 +56,7 @@ func (cfg *apiConfig)createChirpHandler(w http.ResponseWriter, r *http.Request){
 	cleanedBody := filterProfanity(req.Body)
 	
 
-	// success response
-	// respondWithJSON(w, http.StatusOK, map[string]string{
-	// 	"cleaned_body": cleanedBody,
-	// })
+	
 
 	params := database.CreateChirpParams{
 		Body : cleanedBody, 

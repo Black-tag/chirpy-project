@@ -24,9 +24,9 @@ type createUserResponse struct {
     }
 
 
-// handler to create users
+
 func (cfg *apiConfig)createUserHandler(w http.ResponseWriter, r *http.Request){
-	// method check
+	
 	if r.Method != "POST"{
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
@@ -40,7 +40,7 @@ func (cfg *apiConfig)createUserHandler(w http.ResponseWriter, r *http.Request){
 		respondWithError(w, http.StatusBadRequest,"Invalid Request")
 		return
 	}
-	// validate the input 
+	
 	if req.Email == ""  {
 		respondWithError(w, http.StatusBadRequest, "Inavalid request")
 		return
@@ -51,13 +51,6 @@ func (cfg *apiConfig)createUserHandler(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	// _, err := cfg.db.GetUserByEmail(r.Context(), req.Email)
-	// if err == nil {
-	// 	respondWithError(w, http.StatusConflict, " User alredy exist")
-	// 	return
-	// }
-
-	
 
 	user, err := cfg.db.CreateUser(r.Context(), database.CreateUserParams{
 		Email:  req.Email,

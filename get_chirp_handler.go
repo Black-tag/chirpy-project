@@ -8,10 +8,6 @@ import (
 
 
 
-
-
-
-
 func (cfg *apiConfig) getChirpHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	dbChirps, err := cfg.db.GetChirps(r.Context())

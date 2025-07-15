@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"net/http"
 	"time"
-
+	"strings"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
+	
 )
 
 
@@ -66,6 +67,15 @@ func ValidateJWT(tokenString, tokenSecret string) (uuid.UUID, error) {
 		return uuid.Nil, fmt.Errorf("invalid token")
 	}
 
+	if claims.Issuer != "chirpy" {
+    return uuid.Nil, fmt.Errorf("invalid token issuer")
+	}
+
+	if claims.ExpiresAt == nil || time.Now().After(claims.ExpiresAt.Time) {
+    return uuid.Nil, fmt.Errorf("token has expired")
+	}
+
+
 	userID, err := uuid.Parse(claims.Subject)
 	if err != nil {
 		return uuid.Nil, fmt.Errorf("error parsing user ID:%w", err)
@@ -75,8 +85,19 @@ func ValidateJWT(tokenString, tokenSecret string) (uuid.UUID, error) {
 }
 
 func GetBearerToken(headers http.Header) (string, error) {
-	authHeader, err := headers.Get("Authorization")
+	authHeader:= headers.Get("Authorization")
 	if authHeader == "" {
 		return "", errors.New("no header")
 	}
-}
+	parts := strings.Split(authHeader, " ")
+	if len(parts) != 2 {
+		return "", errors.New("malformed authorization header")
+
+	}
+
+	if parts[0] != "Bearer" {
+		return "", errors.New("authorization header must start with Bearer")
+	}
+	return parts[1], nil
+}	
+	

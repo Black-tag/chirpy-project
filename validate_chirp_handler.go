@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
-
+	"github.com/blacktag/chirpy-project/internal/auth"
 	"github.com/blacktag/chirpy-project/internal/database"
 	"github.com/google/uuid"
 )
@@ -37,6 +37,21 @@ func (cfg *apiConfig)createChirpHandler(w http.ResponseWriter, r *http.Request){
 		return
 
 	}
+	fmt.Println("Authorization header:", r.Header.Get("Authorization"))
+	fmt.Println("Validate chirp handler secret:", cfg.secret)
+	tokenString, err := auth.GetBearerToken(r.Header)
+    if err != nil {
+        respondWithError(w, http.StatusUnauthorized, "unauthorized")
+        return
+    }
+
+	userID, err := auth.ValidateJWT(tokenString, cfg.secret)
+    if err != nil {
+        respondWithError(w, http.StatusUnauthorized, "unauthorized")
+        return
+    }
+	
+	fmt.Println("User ID from token:", userID.String())
 
 	
 
@@ -47,8 +62,8 @@ func (cfg *apiConfig)createChirpHandler(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	err := validateChirp(req.Body)
-	if err != nil {
+	erri := validateChirp(req.Body); 
+	if erri != nil {
 		respondWithError(w, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -60,7 +75,7 @@ func (cfg *apiConfig)createChirpHandler(w http.ResponseWriter, r *http.Request){
 
 	params := database.CreateChirpParams{
 		Body : cleanedBody, 
-		UserID: req.UserID,
+		UserID: userID,
 
 	}
 	

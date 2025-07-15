@@ -20,6 +20,7 @@ type apiConfig struct {
 	fileserverHits atomic.Int32
 	db *database.Queries
 	platform string
+	secret string
 	
 }
 
@@ -66,12 +67,14 @@ func main() {
 		log.Fatal(err)
 	}
 	dbQueries := database.New(dbConn)
-
+	secret := os.Getenv("SECRET")
+	
 
 	cfg := apiConfig{
 		fileserverHits: atomic.Int32{},
 		db: dbQueries,
 		platform: platform,
+		secret: secret,
 	}
 	
 

@@ -1,15 +1,17 @@
 package auth
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"net/http"
-	"time"
 	"strings"
+	"time"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
-	
 )
 
 
@@ -100,4 +102,18 @@ func GetBearerToken(headers http.Header) (string, error) {
 	}
 	return parts[1], nil
 }	
+
+
+func MakeRefreshToken() (string, error) {
+	data := make([]byte, 32)
+
+	_, err := rand.Read(data)
+	if err != nil {
+		fmt.Println("error generating random data:", err)
+		return "", err
+	}
+
+	encodedData := hex.EncodeToString(data)
+	return encodedData, nil
+}
 	

@@ -1,23 +1,24 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
-	"net/http"
-	"github.com/blacktag/chirpy-project/internal/auth"
-	"time"
-	"github.com/google/uuid"
 	"fmt"
+	"net/http"
+	"time"
 
-	
-	
+	"github.com/blacktag/chirpy-project/internal/auth"
+	"github.com/blacktag/chirpy-project/internal/database"
+	"github.com/google/uuid"
 )
 
 type loginResponse struct {
-	ID         uuid.UUID `json:"id"`
-	Email      string    `json:"email"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
-	Token      string    `json:"token"`
+	ID           uuid.UUID `json:"id"`
+	Email        string    `json:"email"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+	Token        string    `json:"token"`
+	RefreshToken string    `json:"refresh_token"`
 	
 }
 
@@ -26,17 +27,17 @@ func (cfg *apiConfig) loginUserHandler(w http.ResponseWriter, r *http.Request) {
 	type loginreq struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
-		ExpiresInSeconds int `json:"expires_in_seconds"`
+		
 	}
 
 	var lreq loginreq
 	if err := json.NewDecoder(r.Body).Decode(&lreq); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request format")
 	}
-	if lreq.ExpiresInSeconds == 0 || lreq.ExpiresInSeconds > 3600 {
-		lreq.ExpiresInSeconds = 3600
+	// if lreq.ExpiresInSeconds == 0 || lreq.ExpiresInSeconds > 3600 {
+	// 	lreq.ExpiresInSeconds = 3600
 
-	}
+	// }
 	
 
 	user, err := cfg.db.GetUserByEmail(r.Context(), lreq.Email)
@@ -50,13 +51,37 @@ func (cfg *apiConfig) loginUserHandler(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusUnauthorized, "Incorrect email or password")
 		return
 	}
+	
 	token, err := auth.MakeJWT(
 		user.ID,
 		cfg.secret,
-		time.Duration(lreq.ExpiresInSeconds)*time.Second,
+		time.Hour,
 	)
 	if err != nil {
 		respondWithJSON(w, http.StatusInternalServerError, "failed to generate token")
+		return
+	}
+
+	refreshToken, err := auth.MakeRefreshToken()
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "failed to refresh token")
+		return
+	}
+
+	refreshExpiresAt := time.Now().Add(60 * 24 * time.Hour)
+
+	params := database.CreateRefreshTokenParams{
+		Token: refreshToken,
+		UserID: user.ID,
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+		ExpiresAt: refreshExpiresAt,
+		RevokedAt: sql.NullTime{},
+	}
+
+	err = cfg.db.CreateRefreshToken(r.Context(), params)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "failed to store refreshed token")
 		return
 	}
 
@@ -66,6 +91,7 @@ func (cfg *apiConfig) loginUserHandler(w http.ResponseWriter, r *http.Request) {
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 		Token: token,
+		RefreshToken:refreshToken,
 
 		
 	})

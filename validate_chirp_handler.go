@@ -25,6 +25,8 @@ type Chirp struct {
 	UserID    uuid.UUID `json:"user_id"`
 	Body      string    `json:"body"`
 	
+
+	
 }
 
 
@@ -90,6 +92,7 @@ func (cfg *apiConfig)createChirpHandler(w http.ResponseWriter, r *http.Request){
     	UpdatedAt: chirp.UpdatedAt,
     	Body:      chirp.Body,
     	UserID:    chirp.UserID,
+		
 	})
 	
 }

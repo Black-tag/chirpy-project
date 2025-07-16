@@ -21,6 +21,7 @@ type createUserResponse struct {
         Email     string    `json:"email"`
         CreatedAt time.Time `json:"created_at"`
         UpdatedAt time.Time `json:"updated_at"`
+		IsChirpyRed  bool   `json:"is_chirpy_red"`
     }
 
 
@@ -66,5 +67,6 @@ func (cfg *apiConfig)createUserHandler(w http.ResponseWriter, r *http.Request){
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 		Email:     user.Email,
+		IsChirpyRed:user.IsChirpyRed,
 	})
 }

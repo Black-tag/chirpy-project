@@ -19,6 +19,7 @@ type loginResponse struct {
 	UpdatedAt    time.Time `json:"updated_at"`
 	Token        string    `json:"token"`
 	RefreshToken string    `json:"refresh_token"`
+	IsChirpyRed  bool      `json:"is_chirpy_red"`
 	
 }
 
@@ -77,6 +78,7 @@ func (cfg *apiConfig) loginUserHandler(w http.ResponseWriter, r *http.Request) {
 		UpdatedAt: time.Now().UTC(),
 		ExpiresAt: refreshExpiresAt,
 		RevokedAt: sql.NullTime{},
+		
 	}
 
 	err = cfg.db.CreateRefreshToken(r.Context(), params)
@@ -92,6 +94,7 @@ func (cfg *apiConfig) loginUserHandler(w http.ResponseWriter, r *http.Request) {
 		UpdatedAt: user.UpdatedAt,
 		Token: token,
 		RefreshToken:refreshToken,
+		IsChirpyRed: user.IsChirpyRed,
 
 		
 	})

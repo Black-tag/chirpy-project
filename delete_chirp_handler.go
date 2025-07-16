@@ -16,10 +16,7 @@ func (cfg *apiConfig) deleteChirpByIDHandler(w http.ResponseWriter, r *http.Requ
 		respondWithError(w, http.StatusUnauthorized, "invalid access token")
 		return
 	}
-	// type delchirpreq struct {
-	// 	ID uuid.UUID `json:"user_id"`
-	// }
-	// var req delchirpreq
+	
 
 	userID, err := auth.ValidateJWT(tokenString, cfg.secret)
 	if err != nil {

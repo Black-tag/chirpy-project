@@ -57,6 +57,8 @@ func (cfg *apiConfig) updateCredentialsHandler(w http.ResponseWriter, r *http.Re
 		Email: user.Email,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
+		IsChirpyRed: user.IsChirpyRed,
+		
 	})
 
 }

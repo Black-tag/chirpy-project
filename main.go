@@ -21,6 +21,7 @@ type apiConfig struct {
 	db *database.Queries
 	platform string
 	secret string
+	polka_key string
 	
 }
 
@@ -68,6 +69,7 @@ func main() {
 	}
 	dbQueries := database.New(dbConn)
 	secret := os.Getenv("SECRET")
+	polka_key := os.Getenv("POLKA_KEY")
 	
 
 	cfg := apiConfig{
@@ -75,6 +77,7 @@ func main() {
 		db: dbQueries,
 		platform: platform,
 		secret: secret,
+		polka_key: polka_key,
 	}
 	
 
@@ -84,6 +87,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	//register readiness endpoint
+	mux.HandleFunc("POST /api/polka/webhooks", cfg.webhooksHandler)
 	mux.HandleFunc("DELETE /api/chirps/{chirpID}", cfg.deleteChirpByIDHandler)
 	mux.HandleFunc("PUT /api/users", cfg.updateCredentialsHandler)
 	mux.HandleFunc("/api/revoke", cfg.revokeHandler)

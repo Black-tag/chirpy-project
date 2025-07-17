@@ -16,6 +16,7 @@ import (
 type chirpInput struct {
 	Body string `json:"body"`
 	UserID uuid.UUID `json:"user_id"`
+	
 }
 
 type Chirp struct {
@@ -39,6 +40,7 @@ func (cfg *apiConfig)createChirpHandler(w http.ResponseWriter, r *http.Request){
 		return
 
 	}
+	
 	fmt.Println("Authorization header:", r.Header.Get("Authorization"))
 	fmt.Println("Validate chirp handler secret:", cfg.secret)
 	tokenString, err := auth.GetBearerToken(r.Header)
